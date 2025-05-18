@@ -1,8 +1,10 @@
 package iouiri.hanane.backend.services;
 
+import iouiri.hanane.backend.dtos.CustomerDTO;
 import iouiri.hanane.backend.entities.*;
 import iouiri.hanane.backend.enums.OperationType;
 import iouiri.hanane.backend.exeptions.BankAccountNotFoundException;
+import iouiri.hanane.backend.mappers.BankAccountMapperImpl;
 import iouiri.hanane.backend.repositories.AccountOperationRepository;
 import iouiri.hanane.backend.repositories.BankAccountRepository;
 import iouiri.hanane.backend.exeptions.CustomerNotFoundException;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,12 +27,14 @@ public class BankAccountServiceImpl implements BankAccountService {
     private CustomerRepository customerRepository;
     private BankAccountRepository bankAccountRepository;
     private AccountOperationRepository accountOperationRepository;
+    private BankAccountMapperImpl dtoMapper;
 
     @Override
-    public Customer saveCustomer(Customer customer) {
+    public CustomerDTO saveCustomer(CustomerDTO customerDTO){
         log.info("Saving new customer");
+        Customer customer = dtoMapper.fromCustomerDTO(customerDTO);
         Customer savedCustomer = customerRepository.save(customer);
-        return savedCustomer;
+        return dtoMapper.fromCustomer(savedCustomer);
     }
 
     @Override
@@ -61,8 +66,10 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public List<Customer> listCustomers() {
-        return customerRepository.findAll();
+        public List<CustomerDTO> listCustomers() {
+            List<Customer> customers = customerRepository.findAll();
+            List<CustomerDTO> customerDTOS = customers.stream().map(customer -> dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
+            return customerDTOS;
     }
 
     @Override
@@ -112,5 +119,23 @@ public class BankAccountServiceImpl implements BankAccountService {
     public void transfer(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, ma.enset.ebankingbackend.exceptions.BalanceNotSufficientException {
         debit(accountIdSource, amount, "Transfer to " + accountIdDestination);
         credit(accountIdDestination, amount, "Transfer from " + accountIdSource);
+    }
+    @Override
+    public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        return dtoMapper.fromCustomer(customer);
+    }
+
+    @Override
+    public CustomerDTO updateCustomer(CustomerDTO customerDTO) {
+        log.info("Updating customer");
+        Customer customer = dtoMapper.fromCustomerDTO(customerDTO);
+        Customer savedCustomer = customerRepository.save(customer);
+        return dtoMapper.fromCustomer(savedCustomer);
+    }
+
+    @Override
+    public void deleteCustomer(Long customerId) {
+        customerRepository.deleteById(customerId);
     }
 }

@@ -1,5 +1,6 @@
 package iouiri.hanane.backend;
 
+import iouiri.hanane.backend.dtos.CustomerDTO;
 import iouiri.hanane.backend.entities.*;
 import iouiri.hanane.backend.enums.AccountStatus;
 import iouiri.hanane.backend.enums.OperationType;
@@ -31,7 +32,7 @@ public class BackendApplication {
     CommandLineRunner commandLineRunner(BankAccountService bankAccountService) {
         return args -> {
             Stream.of("Hassan", "Hanane", "Mohamed").forEach(name -> {
-                Customer customer = new Customer();
+                CustomerDTO customer = new CustomerDTO();
                 customer.setName(name);
                 customer.setEmail(name + "@gmail.com");
                 bankAccountService.saveCustomer(customer);
