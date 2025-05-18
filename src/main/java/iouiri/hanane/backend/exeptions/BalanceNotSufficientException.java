@@ -1,4 +1,4 @@
-package ma.enset.ebankingbackend.exceptions;
+package iouiri.hanane.backend.exeptions;
 
 public class BalanceNotSufficientException extends Exception {
     public BalanceNotSufficientException(String message) {
