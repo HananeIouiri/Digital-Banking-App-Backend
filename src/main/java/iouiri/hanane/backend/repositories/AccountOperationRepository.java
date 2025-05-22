@@ -1,6 +1,5 @@
 package iouiri.hanane.backend.repositories;
 
-
 import iouiri.hanane.backend.entities.AccountOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,5 +9,5 @@ import java.util.List;
 
 public interface AccountOperationRepository extends JpaRepository<AccountOperation, Long> {
     List<AccountOperation> findByBankAccountId(String accountId);
-    Page<AccountOperation> findByBankAccountId(String accountId, Pageable pageable);
+    Page<AccountOperation> findByBankAccountIdOrderByOperationDateDesc(String accountId, Pageable pageable);
 }
